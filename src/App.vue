@@ -8,8 +8,8 @@
     >
       <v-list dense>
         <!--HOME SCREEN-->
-        <template :to="{ name: 'home' }">
-          <v-list-item>
+        <template>
+          <v-list-item :to="{ name: 'home' }">
             <v-list-item-action>
             <v-icon>home</v-icon>
           </v-list-item-action>
@@ -38,7 +38,7 @@
             </v-list-item>
             <!--CATEGORIES ITEM-->
             <!--ARTICLES ITEM-->
-            <v-list-item :to="{ name: '' }">
+            <v-list-item :to="{ name: 'article' }">
               <v-list-item-action>
                 <v-icon>table_chart</v-icon>
               </v-list-item-action>
@@ -218,6 +218,8 @@ export default {
 
   data: () => ({
     drawer: null,
+    dialog: false,
+    dialogDelete: false,
   }),
 };
 </script>

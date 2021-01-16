@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home'
 
 import Category from './components/Category'
-
+import Article from './components/Article'
 Vue.use(Router)
 
 /**
@@ -17,6 +17,16 @@ let router = new Router({
             name:'home',
             component:Home
         },
+        {
+            path:'/category',
+            name:'category',
+            component:Category
+        },
+        {
+            path:'/article',
+            name:'article',
+            component:Article
+        }
         
     ]  
 })
