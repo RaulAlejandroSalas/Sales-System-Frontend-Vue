@@ -2,13 +2,14 @@
   <v-app id="app">
     <!--DRAWER -->
     <v-navigation-drawer
+      v-if="islogged"
       v-model="drawer"
       :clipped="$vuetify.breakpoint.lgAndUp"
       app
     >
       <v-list dense>
         <!--HOME SCREEN-->
-        <template>
+        <template v-if="isAdmin || isGrocer || isSeller ">
           <v-list-item :to="{ name: 'home' }">
             <v-list-item-action>
             <v-icon>home</v-icon>
@@ -20,7 +21,7 @@
         <!--HOME SCREEN-->
 
         <!--WAREHOUSE SECCTION DRAWER-->
-        <template>
+        <template v-if="isAdmin || isGrocer ">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -52,7 +53,7 @@
         <!--WAREHOUSE SECCTION DRAWER-->
 
         <!--PURCHASES SECCTION DRAWER-->
-        <template>
+        <template v-if="isAdmin || isGrocer ">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -85,7 +86,7 @@
         <!--PURCHASES SECCTION DRAWER-->
 
         <!--SALES SECCTION DRAWER-->
-        <template>
+        <template v-if="isAdmin || isSeller ">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -118,7 +119,7 @@
         </template>
         <!--SALES SECCTION DRAWER-->
         <!--ACCESS SECCTION DRAWER-->
-        <template>
+        <template v-if="isAdmin ">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -138,7 +139,7 @@
         <!--ACCESS SECCTION DRAWER-->
 
         <!--QUERIES SECCTION DRAWER-->
-        <template>
+        <template v-if="isAdmin || isGrocer || isSeller ">
           <v-list-group>
             <v-list-item slot="activator">
               <v-list-item-content>
@@ -177,11 +178,14 @@
     >
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-        <span class="hidden-sm-and-down">Sistema</span>
+        <span class="hidden-sm-and-down">Sales System V1</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon>
+      <v-btn @click="logout()" icon v-if="islogged">
         <v-icon>input</v-icon>
+      </v-btn>
+      <v-btn :to="{name:'login'}" icon v-else>
+        <v-icon>apps</v-icon>
       </v-btn>
     </v-app-bar>
     <!--APP-NAV-->
@@ -197,13 +201,10 @@
     <!--MAIN CONTENT-->
 
     <!--FOOTER-->
-    <v-footer dark height="auto">
-      <v-layout justify-content>
-        <v-flex text-xs-center>
-          <v-card flat tile color="primary" class="white--text">
-            <v-card-text class="white--text pt-0">
-              Rauls Soft Corp &copy;2021
-            </v-card-text>
+    <v-footer   color="blue darken-3">
+      <v-layout>
+        <v-flex >
+          <v-card  style="width: 300px" class="white--text">
           </v-card>
         </v-flex>
       </v-layout>
@@ -217,9 +218,31 @@ export default {
   name: "App",
 
   data: () => ({
-    drawer: null,
+    drawer: true,
     dialog: false,
     dialogDelete: false,
   }),
+  computed:{
+    islogged(){
+      return this.$store.state.user
+    },
+    isAdmin(){
+      return this.$store.state.user && this.$store.state.user.rol == "ADMIN"
+    },
+    isSeller(){
+      return this.$store.state.user && this.$store.state.user.rol == "SELLER"
+    },
+    isGrocer(){
+      return this.$store.state.user && this.$store.state.user.rol == "GROCER"
+    },
+  },
+  created(){
+    this.$store.dispatch('autoLogin')
+  },
+  methods:{
+    logout(){
+      this.$store.dispatch('exit')
+    }
+  }
 };
 </script>

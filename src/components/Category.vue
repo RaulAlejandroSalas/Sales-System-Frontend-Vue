@@ -1,111 +1,97 @@
 <template>
   <v-layout align-start>
     <v-flex>
+      <v-toolbar flat color="white">
+        <v-toolbar-title>Categories</v-toolbar-title>
+        <v-divider class="mx-2" inset vertical></v-divider>
+        <v-spacer></v-spacer>
+        <v-text-field
+          class="text-xs-center"
+          v-model="search"
+          append-icon="search"
+          label="Search"
+          single-line
+          hide-details
+        ></v-text-field>
+        <v-spacer></v-spacer>
+        <v-dialog v-model="dialog" max-width="500px">
+          <template v-slot:activator="{ on }">
+            <v-btn color="primary" dark class="mb-2" v-on="on">Create</v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              <span class="headline">{{ formTitle }}</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12 sm12 md12>
+                    <v-text-field v-model="name" label="Name"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm12 md12>
+                    <v-text-field
+                      v-model="description"
+                      label="Description"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm12 md12 v-show="valid">
+                    <div
+                      class="red--text"
+                      v-for="v in validMessage"
+                      :key="v"
+                      v-text="v"
+                    ></div>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+              <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-toolbar>
+
       <v-data-table
         :headers="headers"
         :search="search"
-        :items="desserts"
-        sort-by="calories"
+        :sort-by="name"
+        :items="categories"
         class="elevation-1"
       >
-        <template v-slot:top>
-          <v-toolbar flat>
-            <v-toolbar-title>Categories</v-toolbar-title>
-            <v-divider class="mx-4" inset vertical></v-divider>
-            <v-text-field class="text-xs-center" v-model="search" append-icon="search"
-                label="Search" single-line hide-details
-            ></v-text-field>
-            <v-spacer></v-spacer>
-            <v-dialog v-model="dialog" max-width="500px">
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  color="primary"
-                  dark
-                  class="mb-2"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  Create Category
-                </v-btn>
-              </template>
-              <v-card>
-                <v-card-title>
-                  <span class="headline">{{ formTitle }}</span>
-                </v-card-title>
-
-                <v-card-text>
-                  <v-container>
-                    <v-row>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.name"
-                          label="Dessert name"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.calories"
-                          label="Calories"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.fat"
-                          label="Fat (g)"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.carbs"
-                          label="Carbs (g)"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.protein"
-                          label="Protein (g)"
-                        ></v-text-field>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </v-card-text>
-
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="close">
-                    Cancel
-                  </v-btn>
-                  <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
-                <v-card-title class="headline"
-                  >Are you sure you want to delete this item?</v-card-title
-                >
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="closeDelete"
-                    >Cancel</v-btn
-                  >
-                  <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                    >OK</v-btn
-                  >
-                  <v-spacer></v-spacer>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-toolbar>
+        <template v-slot:item.name="{ item }">
+          <span>{{ item.name }}</span>
         </template>
-        <template v-slot:item.actions="{ item }">
-          <v-icon small class="mr-2" @click="editItem(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+
+        <template v-slot:item.description="{ item }">
+          <span>{{ item.description }}</span>
+        </template>
+
+        <template v-slot:item.state="{ item }">
+          <div v-if="item.state">
+            <span class="blue--text">Activo</span>
+          </div>
+          <div v-else>
+            <span class="red--text">Inactivo</span>
+          </div>
+        </template>
+        <template v-slot:item.options="{ item }">
+          <td class="justify-center layout px-0">
+            <v-icon small class="mr-2" @click="editItem(item)">edit</v-icon>
+            <template v-if="item.state">
+              <v-icon small class="mr-2" @click="editItem(item)">
+                block
+              </v-icon>
+            </template>
+            <template v-else>
+              <v-icon small @click="deleteItem(item)">check </v-icon>
+            </template>
+          </td>
         </template>
         <template v-slot:no-data>
-          <v-btn color="primary" @click="initialize"> Reset </v-btn>
+          <v-btn color="primary" @click="listCategories()">Reset</v-btn>
         </template>
       </v-data-table>
     </v-flex>
@@ -113,42 +99,29 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
-    categories:[],
-    search:'',
+    _id: "",
+    adId: "",
+    name: "",
+    description: "",
+    categories: [],
+    search: "",
+    valid: 0,
+    validMessage: [],
+    addModal: 0,
+    addAction: 0,
     headers: [
-      {
-        text: "Dessert (100g serving)",
-        align: "start",
-        sortable: false,
-        value: "name",
-      },
-      { text: "Calories", value: "calories" },
-      { text: "Fat (g)", value: "fat" },
-      { text: "Carbs (g)", value: "carbs" },
-      { text: "Protein (g)", value: "protein" },
-      { text: "Actions", value: "actions", sortable: false },
+      { text: "Name", value: "name", sortable: true },
+      { text: "Description", value: "description", sortable: false },
+      { text: "State", value: "state", sortable: false },
+      { text: "Options", value: "options", sortable: false },
     ],
     desserts: [],
     editedIndex: -1,
-    editedItem: {
-      name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
-    },
-    defaultItem: {
-      name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
-    },
   }),
 
   computed: {
@@ -167,72 +140,63 @@ export default {
   },
 
   created() {
-    this.initialize();
     this.listCategories();
   },
 
   methods: {
-
-    listCategories:()=>{
-      axios.get('http://ec2-18-156-80-201.eu-central-1.compute.amazonaws.com:3000/api/category/list?filter=todos')
-           .then((response)=>{
-              console.log(response.message);
-           }).catch(console.error)
-
+    listCategories() {
+      let me = this;
+      let header = { token: this.$store.state.token };
+      let config = { headers: header };
+      axios
+        .get("category/list", config)
+        .then((response) => {
+          me.categories = response.data;
+        })
+        .catch(console.error);
     },
-
-    initialize() {
-      this.desserts = [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-        },
-      ];
-    },
-
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+      this._id = item._id;
+      this.name = item.name;
+      this.description = item.description;
       this.dialog = true;
+      this.editedIndex = 1;
     },
 
-    deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
+    validateInput() {
+      this.valid = 0;
     },
-
-    deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
-      this.closeDelete();
+    activate() {
+      let me = this;
+      let header = { token: this.$store.state.token };
+      let config = { headers: header };
+      axios
+        .put("category/activate", { _id: this.adId }, config)
+        .then(() => {
+          me.addModal = 0;
+          me.addAction = 0;
+          me.adId = "";
+          me.listCategories();
+        })
+        .catch(console.error);
     },
-
+    deactivate() {
+      let me = this;
+      let header = { token: this.$store.state.token };
+      let config = { headers: header };
+      axios
+        .put("category/deactivate", { _id: this.adId }, config)
+        .then(() => {
+          me.addModal = 0;
+          me.addAction = 0;
+          me.adId = "";
+          me.listCategories();
+        })
+        .catch(console.error);
+    },
+    save() {},
     close() {
       this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
-      } else {
-        this.desserts.push(this.editedItem);
-      }
-      this.close();
     },
   },
 };
